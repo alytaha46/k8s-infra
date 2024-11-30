@@ -1,4 +1,6 @@
-name: Tofu Workflow
+name: Task Infrastructure
+run-name: ${{ github.event.inputs.Action }} Task Infrastructure ${{ github.event.inputs.module != '' && github.event.inputs.module || null}} by ${{ github.actor}}
+
 
 on:
   workflow_dispatch:

@@ -41,17 +41,15 @@ jobs:
         uses: opentofu/setup-opentofu@v1.0.4
 
       - name: Run tofu init
-        if: github.event.inputs.backend_config_file == ''
+        if: github.event.inputs.backend_config_file != ''
         run: |
             tofu init -backend-config=${{ github.event.inputs.backend_config_file }}  -reconfigure
-        if: github.event.inputs.backend_config_file != ''
 
       - name: Run tofu init
         if: github.event.inputs.backend_config_file == ''
         run: |
             tofu init  -reconfigure
         
-
       - name: Run tofu plan
         if: ${{ github.event.inputs.action == 'plan' && github.event.inputs.module != '' }}
         run: |
@@ -67,7 +65,7 @@ jobs:
         run: |
             tofu apply -var-file ./config/sandbox.tfvars --auto-approve -target=${{ github.event.inputs.module }}
 
-        - name: Run tofu apply
+      - name: Run tofu apply
         if: ${{ github.event.inputs.action == 'apply' && github.event.inputs.module == '' }}
         run: |
             tofu apply -var-file ./config/sandbox.tfvars --auto-approve

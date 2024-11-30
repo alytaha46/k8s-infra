@@ -1,0 +1,6 @@
+bootstrap/.terraform/*
+.terraform/*
+.terraform.lock.hcl
+bootstrap/.terraform.lock.hcl
+bootstrap/terraform.tfstate
+bootstrap/terraform.tfstate.backup

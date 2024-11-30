@@ -18,6 +18,10 @@ on:
         description: 'Specify the module to operate on (optional)'
         required: false
         type: string
+      backend_config_file:
+        description: 'Specify the backend config file (optional)'
+        required: false
+        type: string
 
 jobs:
   tofu-job:
@@ -37,35 +41,44 @@ jobs:
         uses: opentofu/setup-opentofu@v1.0.4
 
       - name: Run tofu init
+        if: github.event.inputs.backend_config_file == ''
         run: |
-            tofu init
+            tofu init -backend-config=${{ github.event.inputs.backend_config_file }}  -reconfigure
+        if: github.event.inputs.backend_config_file != ''
+
+      - name: Run tofu init
+        if: github.event.inputs.backend_config_file == ''
+        run: |
+            tofu init  -reconfigure
+        
 
       - name: Run tofu plan
-        if: ${{ github.event.inputs.action == 'plan' }}
+        if: ${{ github.event.inputs.action == 'plan' && github.event.inputs.module != '' }}
         run: |
-          echo "Running tofu plan"
-          if [ -n "${{ github.event.inputs.module }}" ]; then
-            tofu plan -target=${{ github.event.inputs.module }}
-          else
-            tofu plan -var-file ./config/sandbox.tfvars
-          fi
+            tofu plan -var-file ./config/sandbox.tfvars -target=${{ github.event.inputs.module }}
+
+      - name: Run tofu plan
+        if: ${{ github.event.inputs.action == 'plan' && github.event.inputs.module == '' }}
+        run: |
+            tofu plan -var-file ./config/sandbox.tfvars 
 
       - name: Run tofu apply
-        if: ${{ github.event.inputs.action == 'apply' }}
+        if: ${{ github.event.inputs.action == 'apply' && github.event.inputs.module != '' }}
         run: |
-          echo "Running tofu apply"
-          if [ -n "${{ github.event.inputs.module }}" ]; then
-            tofu apply -target=${{ github.event.inputs.module }}
-          else
-            tofu apply -var-file ./config/sandbox.tfvars
-          fi
+            tofu apply -var-file ./config/sandbox.tfvars --auto-approve -target=${{ github.event.inputs.module }}
+
+        - name: Run tofu apply
+        if: ${{ github.event.inputs.action == 'apply' && github.event.inputs.module == '' }}
+        run: |
+            tofu apply -var-file ./config/sandbox.tfvars --auto-approve
+
 
       - name: Run tofu destroy
-        if: ${{ github.event.inputs.action == 'destroy' }}
+        if: ${{ github.event.inputs.action == 'destroy' && github.event.inputs.module != '' }}
         run: |
-          echo "Running tofu destroy"
-          if [ -n "${{ github.event.inputs.module }}" ]; then
-            tofu destroy -target=${{ github.event.inputs.module }}
-          else
-            tofu destroy 
-          fi
+            tofu destroy -var-file ./config/sandbox.tfvars --auto-approve -target=${{ github.event.inputs.module }}
+
+      - name: Run tofu destroy
+        if: ${{ github.event.inputs.action == 'destroy' && github.event.inputs.module == '' }}
+        run: |
+            tofu destroy -var-file ./config/sandbox.tfvars --auto-approve  

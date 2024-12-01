@@ -21,7 +21,7 @@ public_subnets   = ["10.0.3.0/24", "10.0.4.0/24"]
 cluster_name                          = "k8s-task-cluster"
 cluster_version                       = "1.31"
 cluster_endpoint_public_access        = true
-cluster_endpoint_public_access_cidrs  = ["102.191.125.141/32"]
+cluster_endpoint_public_access_cidrs  = ["196.129.86.249/32"]
 
 cluster_addons = {
   eks-pod-identity-agent = {}
